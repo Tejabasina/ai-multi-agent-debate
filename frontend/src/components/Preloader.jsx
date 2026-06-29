@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Terminal, Shield, Cpu, RefreshCw } from 'lucide-react';
+
 
 const BOOT_STEPS = [
   { icon: Terminal, text: "LOG_SYS: Initializing quantum debate kernels..." },
@@ -14,6 +15,7 @@ const BOOT_STEPS = [
 export default function Preloader({ onComplete }) {
   const [currentStep, setCurrentStep] = useState(0);
   const [logs, setLogs] = useState([]);
+  const completedRef = useRef(false);
 
   useEffect(() => {
     if (currentStep < BOOT_STEPS.length) {
@@ -23,13 +25,15 @@ export default function Preloader({ onComplete }) {
         setCurrentStep((prev) => prev + 1);
       }, delay);
       return () => clearTimeout(timer);
-    } else {
+    } else if (!completedRef.current) {
+      completedRef.current = true;
       const exitTimer = setTimeout(() => {
         onComplete();
       }, 700);
       return () => clearTimeout(exitTimer);
     }
   }, [currentStep, onComplete]);
+
 
   return (
     <motion.div

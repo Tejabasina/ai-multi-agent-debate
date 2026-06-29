@@ -121,13 +121,14 @@ function LandingChamber({ focusedField, scrollPercent, activeSpeaker }) {
 
       {/* Robot A (Optimist) */}
       <group position={[-2, 0, 0]} rotation={[0, Math.PI / 2, 0]}>
-        <AgentAvatar3D speaker="A" speaking={activeSpeaker === 'A'} />
+        <AgentAvatar3D speakerId="A" isActive={activeSpeaker === 'A'} />
       </group>
 
       {/* Robot B (Risk Analyst) */}
       <group position={[2, 0, 0]} rotation={[0, -Math.PI / 2, 0]}>
-        <AgentAvatar3D speaker="B" speaking={activeSpeaker === 'B'} />
+        <AgentAvatar3D speakerId="B" isActive={activeSpeaker === 'B'} />
       </group>
+
 
       {/* Dynamic Data Splines */}
       <DataStreams activeSpeaker={activeSpeaker} />

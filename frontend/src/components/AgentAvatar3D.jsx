@@ -7,10 +7,12 @@ export default function AgentAvatar3D({ speakerId, isActive, isDimmed, isWinner 
   const groupRef = useRef();
   const headRef = useRef();
   const ringsRef = useRef();
+  const ledRef = useRef();
 
   // Target scales and positions for interpolation
   const targetScaleRef = useRef(new THREE.Vector3(1, 1, 1));
   const currentScaleRef = useRef(new THREE.Vector3(1, 1, 1));
+
 
   useFrame((state) => {
     const t = state.clock.getElapsedTime();
