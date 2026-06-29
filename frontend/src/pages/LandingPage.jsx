@@ -11,6 +11,8 @@ import {
 } from 'lucide-react';
 import Magnetic from '../components/Magnetic';
 import AgentAvatar3D from '../components/AgentAvatar3D';
+import ErrorBoundary from '../components/ErrorBoundary';
+
 
 // ==========================================
 // R3F 3D SUB-COMPONENTS FOR LANDING CANVAS
@@ -235,22 +237,25 @@ export default function LandingPage({ mode = 'login' }) {
         
         {/* LEFT SIDE (70% - 3D SciFi Debate Chamber) */}
         <div className="lg:col-span-7 h-[50vh] lg:h-full relative overflow-hidden bg-gradient-to-br from-[#0A0A0A] to-[#12101e] border-r border-white/5">
-          <Canvas shadows camera={{ position: [-3, 1.5, 5], fov: 40 }}>
-            <color attach="background" args={['#0A0A0A']} />
-            <fog attach="fog" args={['#0A0A0A', 5, 15]} />
-            
-            <LandingChamber 
-              focusedField={focusedField} 
-              scrollPercent={scrollPercent} 
-              activeSpeaker={activeSpeaker} 
-            />
-            
-            <OrbitControls 
-              enableZoom={false} 
-              maxPolarAngle={Math.PI / 2.2} 
-              minPolarAngle={Math.PI / 4} 
-            />
-          </Canvas>
+          <ErrorBoundary>
+            <Canvas shadows camera={{ position: [-3, 1.5, 5], fov: 40 }}>
+              <color attach="background" args={['#0A0A0A']} />
+              <fog attach="fog" args={['#0A0A0A', 5, 15]} />
+              
+              <LandingChamber 
+                focusedField={focusedField} 
+                scrollPercent={scrollPercent} 
+                activeSpeaker={activeSpeaker} 
+              />
+              
+              <OrbitControls 
+                enableZoom={false} 
+                maxPolarAngle={Math.PI / 2.2} 
+                minPolarAngle={Math.PI / 4} 
+              />
+            </Canvas>
+          </ErrorBoundary>
+
           
           {/* Subtle floating overlay inside Canvas viewport */}
           <div className="absolute bottom-6 left-6 z-10 hidden md:block">

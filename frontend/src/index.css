@@ -15,8 +15,12 @@ body {
   overflow-x: hidden;
   background-color: #0A0A0A;
   min-height: 100vh;
-  /* Disable default cursor globally when cursor helper is active */
-  cursor: none !important;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  body, body * {
+    cursor: none !important;
+  }
 }
 
 /* Custom Film Grain Noise Texture */

@@ -47,9 +47,10 @@ function AppContent() {
   }, []);
 
   return (
-    <div className="relative w-screen min-h-screen overflow-x-hidden text-slate-100 flex flex-col font-sans bg-[#0A0A0A] custom-cursor-disabled">
+    <div className="relative w-screen min-h-screen overflow-x-hidden text-slate-100 flex flex-col font-sans bg-[#0A0A0A]">
       {/* Cinematic Custom Fluid Cursor */}
       <CustomCursor />
+
 
       {/* Cinematic log preloader intro */}
       <AnimatePresence mode="wait">

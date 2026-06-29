@@ -4,6 +4,8 @@ import { OrbitControls, Stars } from '@react-three/drei';
 import * as THREE from 'three';
 import AgentAvatar3D from './AgentAvatar3D';
 import JudgeAvatar3D from './JudgeAvatar3D';
+import ErrorBoundary from './ErrorBoundary';
+
 
 // Camera controller component to handle smooth cinematic transitions
 function CameraController({ activeSpeaker }) {
@@ -88,102 +90,104 @@ export default function DebateScene3D({ state, activeSpeaker, verdict }) {
 
   return (
     <div className="absolute inset-0 w-full h-full -z-10 bg-[#0A0A0A]">
-      <Canvas
-        camera={{ position: [0, 0.5, 6.5], fov: 45 }}
-        gl={{ antialias: true }}
-      >
-        {/* Background color */}
-        <color attach="background" args={['#0A0A0A']} />
+      <ErrorBoundary>
+        <Canvas
+          camera={{ position: [0, 0.5, 6.5], fov: 45 }}
+          gl={{ antialias: true }}
+        >
+          {/* Background color */}
+          <color attach="background" args={['#0A0A0A']} />
 
-        {/* Ambient environment stars */}
-        <Stars 
-          radius={80} 
-          depth={40} 
-          count={800} 
-          factor={3} 
-          saturation={0.5} 
-          fade 
-          speed={1.0} 
-        />
-
-        {/* Lighting system */}
-        <ambientLight intensity={0.3} />
-        <directionalLight 
-          position={[5, 10, 3]} 
-          intensity={0.8} 
-          castShadow 
-        />
-        
-        {/* Soft cyan & pink side lights for futuristic palette */}
-        <pointLight position={[-8, -5, -8]} intensity={0.15} color="#818cf8" />
-        <pointLight position={[8, 8, 8]} intensity={0.15} color="#ec4899" />
-
-        {/* Floor Arena Grid */}
-        <gridHelper 
-          args={[40, 40, '#151520', '#08080d']} 
-          position={[0, -1.2, 0]} 
-        />
-
-        {/* Table in the Center */}
-        <DebateTable />
-
-        {/* Floor Highlights underneath positions */}
-        <mesh position={[-2.2, -1.18, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-          <ringGeometry args={[0.7, 0.8, 32]} />
-          <meshBasicMaterial color={isAWinner ? "#f1c40f" : "#ff5e57"} opacity={0.12} transparent />
-        </mesh>
-        
-        <mesh position={[2.2, -1.18, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-          <ringGeometry args={[0.7, 0.8, 32]} />
-          <meshBasicMaterial color={isBWinner ? "#f1c40f" : "#00d2d3"} opacity={0.12} transparent />
-        </mesh>
-
-        <mesh position={[0, -1.18, -1.8]} rotation={[-Math.PI / 2, 0, 0]}>
-          <ringGeometry args={[0.9, 1.0, 32]} />
-          <meshBasicMaterial color="#f1c40f" opacity={0.1} transparent />
-        </mesh>
-
-        {/* Agent A */}
-        <group position={[-2.2, 0, 0]} rotation={[0, 0.4, 0]}>
-          <AgentAvatar3D 
-            speakerId="A" 
-            isActive={isAActive} 
-            isDimmed={isADimmed} 
-            isWinner={isAWinner}
+          {/* Ambient environment stars */}
+          <Stars 
+            radius={80} 
+            depth={40} 
+            count={800} 
+            factor={3} 
+            saturation={0.5} 
+            fade 
+            speed={1.0} 
           />
-        </group>
 
-        {/* Agent B */}
-        <group position={[2.2, 0, 0]} rotation={[0, -0.4, 0]}>
-          <AgentAvatar3D 
-            speakerId="B" 
-            isActive={isBActive} 
-            isDimmed={isBDimmed} 
-            isWinner={isBWinner}
+          {/* Lighting system */}
+          <ambientLight intensity={0.3} />
+          <directionalLight 
+            position={[5, 10, 3]} 
+            intensity={0.8} 
+            castShadow 
           />
-        </group>
+          
+          {/* Soft cyan & pink side lights for futuristic palette */}
+          <pointLight position={[-8, -5, -8]} intensity={0.15} color="#818cf8" />
+          <pointLight position={[8, 8, 8]} intensity={0.15} color="#ec4899" />
 
-        {/* Judge */}
-        <group position={[0, 0.4, -1.8]}>
-          <JudgeAvatar3D 
-            isVisible={true} 
-            isActive={isJActive || isJActivePhase} 
+          {/* Floor Arena Grid */}
+          <gridHelper 
+            args={[40, 40, '#151520', '#08080d']} 
+            position={[0, -1.2, 0]} 
           />
-        </group>
 
-        {/* Camera controller handles automatic focal transitions */}
-        <CameraController activeSpeaker={activeSpeaker} />
+          {/* Table in the Center */}
+          <DebateTable />
 
-        {/* Orbit Controls (constrained to prevent scene breaking) */}
-        <OrbitControls 
-          enableZoom={false} 
-          enablePan={false} 
-          maxPolarAngle={Math.PI / 2.1} 
-          minPolarAngle={Math.PI / 3.5} 
-          minAzimuthAngle={-Math.PI / 5}
-          maxAzimuthAngle={Math.PI / 5}
-        />
-      </Canvas>
+          {/* Floor Highlights underneath positions */}
+          <mesh position={[-2.2, -1.18, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+            <ringGeometry args={[0.7, 0.8, 32]} />
+            <meshBasicMaterial color={isAWinner ? "#f1c40f" : "#ff5e57"} opacity={0.12} transparent />
+          </mesh>
+          
+          <mesh position={[2.2, -1.18, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+            <ringGeometry args={[0.7, 0.8, 32]} />
+            <meshBasicMaterial color={isBWinner ? "#f1c40f" : "#00d2d3"} opacity={0.12} transparent />
+          </mesh>
+
+          <mesh position={[0, -1.18, -1.8]} rotation={[-Math.PI / 2, 0, 0]}>
+            <ringGeometry args={[0.9, 1.0, 32]} />
+            <meshBasicMaterial color="#f1c40f" opacity={0.1} transparent />
+          </mesh>
+
+          {/* Agent A */}
+          <group position={[-2.2, 0, 0]} rotation={[0, 0.4, 0]}>
+            <AgentAvatar3D 
+              speakerId="A" 
+              isActive={isAActive} 
+              isDimmed={isADimmed} 
+              isWinner={isAWinner}
+            />
+          </group>
+
+          {/* Agent B */}
+          <group position={[2.2, 0, 0]} rotation={[0, -0.4, 0]}>
+            <AgentAvatar3D 
+              speakerId="B" 
+              isActive={isBActive} 
+              isDimmed={isBDimmed} 
+              isWinner={isBWinner}
+            />
+          </group>
+
+          {/* Judge */}
+          <group position={[0, 0.4, -1.8]}>
+            <JudgeAvatar3D 
+              isVisible={true} 
+              isActive={isJActive || isJActivePhase} 
+            />
+          </group>
+
+          {/* Camera controller handles automatic focal transitions */}
+          <CameraController activeSpeaker={activeSpeaker} />
+
+          {/* Orbit Controls (constrained to prevent scene breaking) */}
+          <OrbitControls 
+            enableZoom={false} 
+            enablePan={false} 
+            maxPolarAngle={Math.PI / 2.1} 
+            minPolarAngle={Math.PI / 3.5} 
+            minAzimuthAngle={-Math.PI / 5}
+            maxAzimuthAngle={Math.PI / 5}
+          />
+        </Canvas>
+      </ErrorBoundary>
     </div>
   );
 }
