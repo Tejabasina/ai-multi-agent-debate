@@ -9,9 +9,14 @@ export default function AgentAvatar3D({ speakerId, isActive, isDimmed, isWinner 
   const ringsRef = useRef();
   const ledRef = useRef();
 
+  const isA = speakerId === 'A';
+  const mainColor = isWinner ? '#f1c40f' : (isA ? '#ff5e57' : '#00d2d3');
+  const glowColor = isWinner ? '#f39c12' : (isA ? '#ff3f34' : '#0abde3');
+
   // Target scales and positions for interpolation
   const targetScaleRef = useRef(new THREE.Vector3(1, 1, 1));
   const currentScaleRef = useRef(new THREE.Vector3(1, 1, 1));
+
 
 
   useFrame((state) => {
