@@ -65,11 +65,13 @@ export default function AgentAvatar3D({ speakerId, isActive, isDimmed, isWinner 
       ringsRef.current.rotation.z = -t * 0.6;
       ringsRef.current.rotation.y = t * 0.3;
     }
-  });
 
-  const isA = speakerId === 'A';
-  const mainColor = isWinner ? '#f1c40f' : (isA ? '#ff5e57' : '#00d2d3');
-  const glowColor = isWinner ? '#f39c12' : (isA ? '#ff3f34' : '#0abde3');
+    // Nothing style red micro-LED blinking rate
+    if (ledRef.current) {
+      const pulse = Math.sin(t * 4.0) * 0.5 + 0.5;
+      ledRef.current.material.opacity = 0.3 + pulse * 0.7;
+    }
+  });
 
   return (
     <group ref={groupRef}>
@@ -77,26 +79,32 @@ export default function AgentAvatar3D({ speakerId, isActive, isDimmed, isWinner 
       <mesh position={[0, -1.2, 0]}>
         <cylinderGeometry args={[0.7, 0.9, 0.25, 32]} />
         <meshStandardMaterial 
-          color="#1e272e" 
-          roughness={0.4} 
-          metalness={0.8}
+          color="#0d0d0d" 
+          roughness={0.1} 
+          metalness={0.98}
         />
       </mesh>
 
-      {/* Glowing ring on platform */}
+      {/* Glowing platform ring */}
       <mesh position={[0, -1.05, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <ringGeometry args={[0.65, 0.75, 32]} />
         <meshBasicMaterial color={mainColor} toneMapped={false} />
       </mesh>
 
-      {/* Torso (Metallic Robot body) */}
+      {/* Torso (Polished liquid metal robot body) */}
       <mesh position={[0, -0.4, 0]}>
         <coneGeometry args={[0.4, 1.2, 4]} />
         <meshStandardMaterial 
-          color={isDimmed ? '#20242d' : '#323846'} 
-          roughness={0.15} 
-          metalness={0.85} 
+          color={isDimmed ? '#111116' : '#1e1e24'} 
+          roughness={0.06} 
+          metalness={0.96} 
         />
+      </mesh>
+
+      {/* Nothing style red LED indicator dot */}
+      <mesh ref={ledRef} position={[0, -0.2, 0.24]}>
+        <sphereGeometry args={[0.02, 16, 16]} />
+        <meshBasicMaterial color="#ff3b30" transparent opacity={1.0} toneMapped={false} />
       </mesh>
 
       {/* Segmented Robot Arms resting on table */}
@@ -104,28 +112,28 @@ export default function AgentAvatar3D({ speakerId, isActive, isDimmed, isWinner 
         {/* Left Arm */}
         <mesh position={[-0.42, 0.12, 0]}>
           <sphereGeometry args={[0.07, 16, 16]} />
-          <meshStandardMaterial color="#1a1d24" metalness={0.9} roughness={0.2} />
+          <meshStandardMaterial color="#08080c" metalness={0.98} roughness={0.15} />
         </mesh>
         <mesh position={[-0.52, -0.15, 0.15]} rotation={[0.4, 0.2, -0.15]}>
           <cylinderGeometry args={[0.035, 0.035, 0.45, 8]} />
-          <meshStandardMaterial color={isDimmed ? '#20242d' : '#323846'} metalness={0.95} roughness={0.15} />
+          <meshStandardMaterial color={isDimmed ? '#111116' : '#1e1e24'} metalness={0.96} roughness={0.08} />
         </mesh>
 
         {/* Right Arm */}
         <mesh position={[0.42, 0.12, 0]}>
           <sphereGeometry args={[0.07, 16, 16]} />
-          <meshStandardMaterial color="#1a1d24" metalness={0.9} roughness={0.2} />
+          <meshStandardMaterial color="#08080c" metalness={0.98} roughness={0.15} />
         </mesh>
         <mesh position={[0.52, -0.15, 0.15]} rotation={[0.4, -0.2, 0.15]}>
           <cylinderGeometry args={[0.035, 0.035, 0.45, 8]} />
-          <meshStandardMaterial color={isDimmed ? '#20242d' : '#323846'} metalness={0.95} roughness={0.15} />
+          <meshStandardMaterial color={isDimmed ? '#111116' : '#1e1e24'} metalness={0.96} roughness={0.08} />
         </mesh>
       </group>
 
       {/* Neck connector */}
       <mesh position={[0, 0.25, 0]}>
         <cylinderGeometry args={[0.08, 0.08, 0.15, 16]} />
-        <meshStandardMaterial color="#1e272e" />
+        <meshStandardMaterial color="#0a0a0d" metalness={0.99} roughness={0.1} />
       </mesh>
 
       {/* Main Head - animated glowing sphere with nested robot eyes & antenna */}
@@ -138,16 +146,16 @@ export default function AgentAvatar3D({ speakerId, isActive, isDimmed, isWinner 
             emissiveIntensity={1.4}
             distort={0.25}
             speed={3}
-            roughness={0.1}
-            metalness={0.2}
+            roughness={0.05}
+            metalness={0.98}
           />
         ) : (
           <meshStandardMaterial
             color={mainColor}
             emissive={glowColor}
-            emissiveIntensity={isDimmed ? 0.1 : 0.35}
-            roughness={0.25}
-            metalness={0.65}
+            emissiveIntensity={isDimmed ? 0.08 : 0.35}
+            roughness={0.08}
+            metalness={0.95}
           />
         )}
 
@@ -165,7 +173,7 @@ export default function AgentAvatar3D({ speakerId, isActive, isDimmed, isWinner 
         <group position={[0, 0.28, 0]}>
           <mesh position={[0, 0.08, 0]}>
             <cylinderGeometry args={[0.012, 0.012, 0.16, 8]} />
-            <meshStandardMaterial color="#1a1d24" metalness={0.9} roughness={0.2} />
+            <meshStandardMaterial color="#08080c" metalness={0.99} roughness={0.1} />
           </mesh>
           <mesh position={[0, 0.17, 0]}>
             <sphereGeometry args={[0.04, 16, 16]} />
@@ -174,7 +182,7 @@ export default function AgentAvatar3D({ speakerId, isActive, isDimmed, isWinner 
         </group>
       </mesh>
 
-      {/* Surrounding Orbiting Rings */}
+      {/* Orbiting rings */}
       <group ref={ringsRef} position={[0, 0.6, 0]}>
         <mesh rotation={[Math.PI / 4, Math.PI / 4, 0]}>
           <torusGeometry args={[0.52, 0.02, 8, 48]} />

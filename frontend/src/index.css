@@ -1,55 +1,89 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Geist:wght@300;400;500;600;700;800;900&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  font-family: 'Inter', sans-serif;
-  background-color: #080b11;
-  color: #f3f4f6;
+  font-family: 'Geist', 'Inter', sans-serif;
+  background-color: #0A0A0A;
+  color: #f8fafc;
 }
 
 body {
   margin: 0;
   overflow-x: hidden;
-  background: radial-gradient(circle at 50% 50%, #0c1220 0%, #06090e 100%);
+  background-color: #0A0A0A;
   min-height: 100vh;
+  /* Disable default cursor globally when cursor helper is active */
+  cursor: none !important;
 }
 
-/* Glassmorphism Card Style */
+/* Custom Film Grain Noise Texture */
+.noise-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.03;
+  pointer-events: none;
+  z-index: 99999;
+}
+
+/* Aurora Gradient shifting effect */
+@keyframes auroraShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.aurora-bg {
+  background: linear-gradient(135deg, #0A0A0A 20%, #1e1b4b 50%, #064e3b 80%, #0A0A0A 100%);
+  background-size: 400% 400%;
+  animation: auroraShift 20s ease infinite;
+}
+
+/* Glassmorphism Design System Tokens */
 .glass-panel {
-  background: rgba(13, 18, 30, 0.45);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  background: rgba(10, 10, 10, 0.45);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
 }
 
 .glass-panel-heavy {
-  background: rgba(8, 12, 21, 0.85);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.5);
+  background: rgba(8, 8, 8, 0.85);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  box-shadow: 0 16px 48px 0 rgba(0, 0, 0, 0.7);
 }
 
 /* Scrollbar Customization */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(10, 10, 10, 1);
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 9px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.2);
 }
 
-/* Typewriter animation support */
+/* Custom staggers & cursor blink keyframe */
 @keyframes blink {
   50% { opacity: 0; }
 }
@@ -57,6 +91,36 @@ body {
 .cursor-blink::after {
   content: '|';
   animation: blink 0.8s step-end infinite;
-  color: #3b82f6;
+  color: #818cf8;
   margin-left: 2px;
+}
+
+/* Cinematic text reveal stagger animations */
+.char-reveal {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(6px);
+  animation: revealChar 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes revealChar {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Custom interactive selections */
+::selection {
+  background: rgba(129, 140, 248, 0.2);
+  color: #ffffff;
+}
+
+/* Custom Cursor class override (disables native pointer for precision hover layout) */
+.custom-cursor-disabled * {
+  cursor: none !important;
+}
+
+.font-display {
+  font-family: 'Outfit', sans-serif;
 }

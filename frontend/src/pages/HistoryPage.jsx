@@ -1,8 +1,44 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useDebate } from '../context/DebateContext';
 import { useTranslation } from 'react-i18next';
 import { Calendar, Award, ExternalLink, Inbox, Loader2, AlertCircle, Globe } from 'lucide-react';
+
+// Custom 3D Parallax Tilt Card Component
+
+function TiltCard({ children, className }) {
+  const cardRef = useRef(null);
+  const [tilt, setTilt] = useState({ x: 0, y: 0 });
+
+  const handleMouseMove = (e) => {
+    if (!cardRef.current) return;
+    const { left, top, width, height } = cardRef.current.getBoundingClientRect();
+    const x = (e.clientX - left - width / 2) / (width / 2);
+    const y = (e.clientY - top - height / 2) / (height / 2);
+    setTilt({ x: x * 8, y: y * -8 }); // max 8deg tilt
+  };
+
+  const handleMouseLeave = () => {
+    setTilt({ x: 0, y: 0 });
+  };
+
+  return (
+    <div
+      ref={cardRef}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      className={`transition-transform duration-100 ease-out ${className}`}
+      style={{
+        transform: `perspective(1000px) rotateX(${tilt.y}deg) rotateY(${tilt.x}deg) translateZ(10px)`,
+        transformStyle: 'preserve-3d'
+      }}
+    >
+      <div style={{ transform: 'translateZ(25px)' }} className="h-full">
+        {children}
+      </div>
+    </div>
+  );
+}
 
 export default function HistoryPage() {
   const { token } = useDebate();
@@ -57,13 +93,13 @@ export default function HistoryPage() {
   };
 
   return (
-    <div className="w-screen min-h-screen bg-[#080b11] text-slate-100 flex flex-col font-sans select-none pt-24 pb-12 px-6 overflow-y-auto">
+    <div className="w-screen min-h-screen bg-[#0A0A0A] text-slate-100 flex flex-col font-sans select-none pt-24 pb-12 px-6 overflow-y-auto">
       {/* Background gradients */}
       <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-500/5 blur-[120px] rounded-full pointer-events-none -z-10"></div>
       <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-purple-500/5 blur-[120px] rounded-full pointer-events-none -z-10"></div>
 
       <div className="w-full max-w-5xl mx-auto flex-1 flex flex-col">
-        <div className="mb-8">
+        <div className="mb-10">
           <h1 className="text-3xl font-extrabold tracking-tight font-display bg-gradient-to-r from-blue-400 to-indigo-300 bg-clip-text text-transparent uppercase">
             {t('history')}
           </h1>
@@ -100,72 +136,79 @@ export default function HistoryPage() {
             </Link>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          /* High-end Awwwards-style vertical timeline track */
+          <div className="relative border-l border-white/10 pl-6 md:pl-10 ml-4 md:ml-6 space-y-12">
             {debates.map((debate) => {
               const isWinnerA = debate.winner === 'A';
               const isWinnerB = debate.winner === 'B';
               
               return (
-                <div
-                  key={debate.id}
-                  className="glass-panel hover:bg-slate-900/40 border border-white/5 hover:border-white/10 rounded-2xl p-6 transition-all duration-300 flex flex-col justify-between shadow-lg group relative overflow-hidden"
-                >
-                  {/* Subtle hover line highlight */}
-                  <div className={`absolute top-0 left-0 w-[4px] h-full transition-transform duration-300 scale-y-0 group-hover:scale-y-100 ${
-                    isWinnerA ? 'bg-orange-500' : isWinnerB ? 'bg-cyan-500' : 'bg-slate-500'
+                <div key={debate.id} className="relative">
+                  {/* Timeline bullet node */}
+                  <span className={`absolute -left-[31px] md:-left-[47px] top-6 w-4 h-4 rounded-full border bg-[#0A0A0A] z-10 transition-colors duration-300 ${
+                    isWinnerA ? 'border-orange-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]' : isWinnerB ? 'border-cyan-500 shadow-[0_0_8px_rgba(6,182,212,0.5)]' : 'border-slate-600'
                   }`} />
 
-                  <div>
-                    <div className="flex items-center justify-between gap-4 mb-3.5">
-                      <div className="flex items-center gap-2">
-                        <span className="text-[10px] text-slate-500 font-mono tracking-wider bg-slate-950 px-2 py-0.5 rounded border border-slate-800">
-                          ID: {debate.id.slice(0, 8)}...
-                        </span>
-                        {debate.language && (
-                          <span className="flex items-center gap-1 text-[9px] text-blue-400 font-semibold uppercase tracking-wider bg-blue-950/40 px-2 py-0.5 rounded border border-blue-900/40">
-                            <Globe className="w-2.5 h-2.5" />
-                            {debate.language}
-                          </span>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-1.5 text-[10px] text-slate-400 font-bold uppercase tracking-wider">
-                        <Calendar className="w-3 h-3 text-blue-500/80" />
-                        {formatDate(debate.created_at)}
-                      </div>
-                    </div>
+                  <TiltCard className="w-full">
+                    <div className="glass-panel hover:bg-slate-900/40 border border-white/5 hover:border-white/10 rounded-2xl p-6 transition-all duration-300 flex flex-col justify-between shadow-lg group relative overflow-hidden">
+                      {/* Left border indicator */}
+                      <div className={`absolute top-0 left-0 w-[4px] h-full transition-transform duration-300 scale-y-0 group-hover:scale-y-100 ${
+                        isWinnerA ? 'bg-orange-500' : isWinnerB ? 'bg-cyan-500' : 'bg-slate-500'
+                      }`} />
 
-                    <h3 className="text-base font-bold text-slate-100 group-hover:text-white leading-snug line-clamp-2 select-text mb-4">
-                      {debate.topic}
-                    </h3>
-                  </div>
-
-                  <div className="flex items-center justify-between border-t border-slate-800/40 pt-4 mt-2">
-                    <div className="flex items-center gap-2">
-                      <div className={`p-1.5 rounded-md ${
-                        isWinnerA ? 'bg-orange-500/10 text-orange-400' : isWinnerB ? 'bg-cyan-500/10 text-cyan-400' : 'bg-slate-800 text-slate-400'
-                      }`}>
-                        <Award className="w-3.5 h-3.5" />
-                      </div>
                       <div>
-                        <p className="text-[9px] text-slate-500 font-bold uppercase tracking-wider">
-                          Winner
-                        </p>
-                        <p className={`text-xs font-black uppercase tracking-wider ${
-                          isWinnerA ? 'text-orange-400' : isWinnerB ? 'text-cyan-400' : 'text-slate-400'
-                        }`}>
-                          {debate.winner === 'A' ? 'Agent A (Optimist)' : debate.winner === 'B' ? 'Agent B (Risk)' : 'Draw'}
-                        </p>
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="text-[10px] text-slate-500 font-mono tracking-wider bg-slate-950 px-2 py-0.5 rounded border border-slate-800">
+                              ID: {debate.id.slice(0, 8)}...
+                            </span>
+                            {debate.language && (
+                              <span className="flex items-center gap-1 text-[9px] text-blue-400 font-semibold uppercase tracking-wider bg-blue-950/40 px-2 py-0.5 rounded border border-blue-900/40">
+                                <Globe className="w-2.5 h-2.5" />
+                                {debate.language}
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-1.5 text-[10px] text-slate-400 font-bold uppercase tracking-wider">
+                            <Calendar className="w-3 h-3 text-blue-500/80" />
+                            {formatDate(debate.created_at)}
+                          </div>
+                        </div>
+
+                        <h3 className="text-base md:text-lg font-bold text-slate-100 group-hover:text-white leading-snug select-text mb-5">
+                          {debate.topic}
+                        </h3>
+                      </div>
+
+                      <div className="flex items-center justify-between border-t border-slate-800/40 pt-4 mt-2">
+                        <div className="flex items-center gap-2">
+                          <div className={`p-1.5 rounded-md ${
+                            isWinnerA ? 'bg-orange-500/10 text-orange-400' : isWinnerB ? 'bg-cyan-500/10 text-cyan-400' : 'bg-slate-800 text-slate-400'
+                          }`}>
+                            <Award className="w-3.5 h-3.5" />
+                          </div>
+                          <div>
+                            <p className="text-[9px] text-slate-500 font-bold uppercase tracking-wider">
+                              Winner
+                            </p>
+                            <p className={`text-xs font-black uppercase tracking-wider ${
+                              isWinnerA ? 'text-orange-400' : isWinnerB ? 'text-cyan-400' : 'text-slate-400'
+                            }`}>
+                              {debate.winner === 'A' ? 'Agent A (Optimist)' : debate.winner === 'B' ? 'Agent B (Risk)' : 'Draw'}
+                            </p>
+                          </div>
+                        </div>
+
+                        <Link
+                          to={`/debate/${debate.id}`}
+                          className="flex items-center gap-1 px-3.5 py-2 bg-slate-950 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-slate-300 hover:text-white rounded-lg text-xs font-semibold uppercase tracking-wider transition-all duration-200 active:scale-[0.97]"
+                        >
+                          View
+                          <ExternalLink className="w-3 h-3" />
+                        </Link>
                       </div>
                     </div>
-
-                    <Link
-                      to={`/debate/${debate.id}`}
-                      className="flex items-center gap-1 px-3 py-1.5 bg-slate-950 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-slate-300 hover:text-white rounded-lg text-xs font-semibold uppercase tracking-wider transition-all duration-200 active:scale-[0.97]"
-                    >
-                      View
-                      <ExternalLink className="w-3 h-3" />
-                    </Link>
-                  </div>
+                  </TiltCard>
                 </div>
               );
             })}

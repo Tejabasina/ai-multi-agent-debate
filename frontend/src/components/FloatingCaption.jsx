@@ -1,34 +1,15 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
+import { motion } from 'framer-motion';
 
 export default function FloatingCaption({ speaker, text, active }) {
-  const [displayedText, setDisplayedText] = useState('');
   const textEndRef = useRef(null);
 
-  // Typewriter effect that smoothly catches up with the stream
+  // Auto-scroll to the bottom of the subtitle box
   useEffect(() => {
-    if (!text) {
-      setDisplayedText('');
-      return;
+    if (textEndRef.current) {
+      textEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
-
-    const diff = text.length - displayedText.length;
-    // Catch up faster if it falls behind significantly
-    const stepSize = diff > 40 ? 5 : diff > 15 ? 2 : 1;
-
-    const interval = setInterval(() => {
-      setDisplayedText((prev) => {
-        if (prev.length < text.length) {
-          return text.slice(0, prev.length + stepSize);
-        }
-        clearInterval(interval);
-        return prev;
-      });
-    }, 12);
-
-    return () => clearInterval(interval);
-  }, [text, displayedText.length]);
-
-  if (!active || !displayedText) return null;
+  }, [text]);
 
   const isA = speaker === 'A';
   const themeText = isA ? 'Agent A' : 'Agent B';
@@ -45,14 +26,21 @@ export default function FloatingCaption({ speaker, text, active }) {
   // Detect Arabic script characters for RTL layout
   const isRtl = /[\u0600-\u06FF]/.test(text);
 
+  // Split text into words for stagger reveal animations
+  const words = text ? text.split(' ') : [];
+
   return (
-    <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-20 w-[92%] max-w-2xl transition-all duration-300 transform scale-100 ease-out">
-      <div className="glass-panel-heavy rounded-2xl border border-white/10 p-5 md:p-6 shadow-2xl relative overflow-hidden">
-        
+    <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-20 w-[92%] max-w-2xl">
+      <motion.div
+        initial={{ opacity: 0, y: 15 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ type: 'spring', stiffness: 100, damping: 14 }}
+        className="glass-panel-heavy rounded-2xl border border-white/10 p-5 md:p-6 shadow-2xl relative overflow-hidden"
+      >
         {/* Glow indicator top line */}
         <div className={`absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r ${glowColorClass}`}></div>
 
-        <div className={`flex items-center gap-2 mb-2.5 select-none ${isRtl ? 'flex-row-reverse' : ''}`}>
+        <div className={`flex items-center gap-2 mb-3 select-none ${isRtl ? 'flex-row-reverse' : ''}`}>
           <span className={`text-[10px] md:text-xs font-black uppercase tracking-wider px-2 py-0.5 rounded border ${badgeColorClass}`}>
             {themeText}
           </span>
@@ -63,15 +51,24 @@ export default function FloatingCaption({ speaker, text, active }) {
 
         <div 
           dir={isRtl ? 'rtl' : 'ltr'}
-          className={`text-slate-100 text-sm md:text-base font-medium leading-relaxed max-h-28 overflow-y-auto pr-1 font-sans select-text scroll-smooth ${
+          className={`text-slate-100 text-sm md:text-base font-semibold leading-relaxed max-h-28 overflow-y-auto pr-1 font-sans select-text scroll-smooth ${
             isRtl ? 'text-right' : 'text-left'
           }`}
         >
-          <span className="cursor-blink">{displayedText}</span>
-          <div ref={textEndRef} />
+          {words.map((word, i) => (
+            <motion.span
+              key={i}
+              initial={{ opacity: 0, y: 4 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.22, delay: Math.min(i * 0.03, 0.4) }}
+              className="inline-block mr-1.5"
+            >
+              {word}
+            </motion.span>
+          ))}
+          <div ref={textEndRef} className="h-2" />
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }
-

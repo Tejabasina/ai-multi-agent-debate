@@ -34,8 +34,9 @@ describe('Frontend Components Unit Tests', () => {
     // Check headings rendering
     expect(screen.getByText('initiate_debate')).toBeInTheDocument();
 
-    const input = screen.getByPlaceholderText(/Enter a topic/i);
+    const input = screen.getByPlaceholderText(/Should space exploration/i);
     expect(input).toBeInTheDocument();
+
 
     // Type topic
     fireEvent.change(input, { target: { value: 'Should robots build robots?' } });
@@ -58,9 +59,10 @@ describe('Frontend Components Unit Tests', () => {
     render(<VerdictCard verdict={mockVerdict} onReset={handleReset} />);
 
     expect(screen.getByText('verdict_delivered')).toBeInTheDocument();
-    expect(screen.getByText(/92\/100/)).toBeInTheDocument();
-    expect(screen.getByText(/84\/100/)).toBeInTheDocument();
+    expect(screen.getByText('92')).toBeInTheDocument();
+    expect(screen.getByText('84')).toBeInTheDocument();
     expect(screen.getByText(/"Agent A was highly constructive and coherent."/)).toBeInTheDocument();
+
 
     const resetBtn = screen.getByRole('button', { name: /start_new_debate/i });
     fireEvent.click(resetBtn);
